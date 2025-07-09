@@ -33,7 +33,7 @@ math_question_pipeline/
 
 ```bash
 git clone https://github.com/RenBing-Sumeru/Multi-agent-Mathematical-Proof.git
-cd math_question_pipeline
+cd Multi-agent-Mathematical-Proof
 ```
 
 ### 2. 创建并激活虚拟环境 (推荐)
@@ -64,8 +64,8 @@ export ANTHROPIC_API_KEY="sk-ant-..."
 export DEEPSEEK_API_KEY="..." # 根据需要设置
 
 # Windows (CMD)
-set OPENAI_API_KEY="sk-..."
-set GOOGLE_API_KEY="AIzaSy..."
+set OPENAI_API_KEY=sk-...
+set GOOGLE_API_KEY=AIzaSy...
 # ...
 ```
 
