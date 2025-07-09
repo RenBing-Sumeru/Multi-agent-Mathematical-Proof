@@ -4,11 +4,12 @@
 import logging
 import random
 from typing import List, Dict, Any
+import asyncio
 
 import config
 from src import prompts, llm_api, utils
 
-def run_generation_stage(seed_file: str, output_file: str) -> None:
+async def run_generation_stage(seed_file: str, output_file: str) -> None:
     """
     执行阶段一：从种子文件生成包含错误证明/定义的数据。
     """
@@ -28,21 +29,27 @@ def run_generation_stage(seed_file: str, output_file: str) -> None:
         }
 
         generated_items_from_all_models = []
-        for model_name in config.GENERATOR_MODELS:
-            system_prompt = prompts.PROOF_GEN_PROMPT if seed['type'] == 'proposition-proof' else prompts.DEFINITION_GEN_PROMPT
-            
+        
+        async def get_items(model_name):
+            system_prompt = PROOF_GEN_PROMPT if seed['type'] == 'proposition-proof' else DEFINITION_GEN_PROMPT
             if seed['type'] == 'proposition-proof':
                 user_content = f"Here's the proposition:\n\n{seed['content']['proposition']}\n\n\nHere's the proof:\n\n{seed['content']['proof']}"
             else:
                 user_content = f"Here's the definition:\n\n{seed['content']['text']}"
-            
             messages = [{"role": "system", "content": system_prompt}, {"role": "user", "content": user_content}]
-            response_text = llm_api.call_llm(model_name, messages)
-            items = [item.strip() for item in utils.parse_generated_items(response_text)]
-            logging.info(f"  - Model {model_name} generated {len(items)} items.")
-            
+            response_text = await asyncio.to_thread(call_llm, model_name, messages)
+            items = [item.strip() for item in parse_generated_items(response_text)]
+            print(f"  - Model {model_name} generated {len(items)} items.")
             sampled_items = random.sample(items, 2) if len(items) >= 2 else items
-            generated_items_from_all_models.extend(sampled_items)
+            return sampled_items
+
+        tasks = []
+        
+        async with asyncio.TaskGroup() as tg:
+            for model_name in GENERATOR_MODELS:
+                tasks.append(tg.create_task(get_items(model_name)))
+        for task in tasks:
+            generated_items_from_all_models.extend(await task)
 
         for i, item_content in enumerate(generated_items_from_all_models):
             content = {"proposition": seed['content']['proposition'], "proof": item_content} if seed['type'] == 'proposition-proof' else {"text": item_content}
@@ -52,7 +59,7 @@ def run_generation_stage(seed_file: str, output_file: str) -> None:
 
     utils.save_to_json(all_generated_data, output_file)
 
-def run_filtering_stage(generated_file: str, output_file: str) -> None:
+async def run_filtering_stage(generated_file: str, output_file: str) -> None:
     """
     执行阶段二：筛选生成的数据，保留高质量题目。
     """
@@ -66,24 +73,30 @@ def run_filtering_stage(generated_file: str, output_file: str) -> None:
     for packet in all_generated_data:
         logging.info(f"--- Filtering Packet for Seed ID: {packet['seed_id']} ---")
         questions_to_filter = [packet['original_correct']] + packet['generated_incorrect']
+        questions_to_filter = random.shuffle(questions_to_filter)
 
         for question in questions_to_filter:
             logging.info(f"  -- Filtering question: {question['id']} (Truth: {question['ground_truth']})")
-            judgements = []
-            for model_name in config.FILTER_MODELS:
-                for _ in range(config.JUDGEMENT_RUNS_PER_MODEL):
-                    if packet['type'] == 'proposition-proof':
-                        prompt = prompts.PROOF_EVAL_PROMPT + f"\n\n{question['content']['proposition']}\n\n\nHere is the proof:\n\n{question['content']['proof']}"
-                    else:
-                        prompt = prompts.DEFINITION_EVAL_PROMPT + f"\n\n{question['content']['text']}"
-                    
-                    messages = [{"role": "user", "content": prompt}]
-                    response_text = llm_api.call_llm(model_name, messages)
-                    eval_result = utils.parse_eval_result(response_text)
-                    
-                    model_is_correct = 1 if (question['ground_truth'] == 'Correct' and eval_result == 'T') or \
-                                           (question['ground_truth'] == 'Wrong' and eval_result == 'F') else 0
-                    judgements.append(model_is_correct)
+            async def judge_one(model_name, prompt):
+                messages = [{"role": "user", "content": prompt}]
+                response_text = await asyncio.to_thread(call_llm, model_name, messages)
+                eval_result = parse_eval_result(response_text)
+                if (question['ground_truth'] == 'Correct' and eval_result == 'T') or \
+                   (question['ground_truth'] == 'Wrong' and eval_result == 'F'):
+                    return 1
+                return 0
+
+            tasks = []
+            
+            async with asyncio.TaskGroup() as tg:
+                for model_name in FILTER_MODELS:
+                    for _ in range(JUDGEMENT_RUNS_PER_MODEL):
+                        if packet['type'] == 'proposition-proof':
+                            prompt = PROOF_EVAL_PROMPT + f"\n\n{question['content']['proposition']}\n\n\nHere is the proof:\n\n{question['content']['proof']}"
+                        else:
+                            prompt = DEFINITION_EVAL_PROMPT + f"\n\n{question['content']['text']}"
+                        tasks.append(tg.create_task(judge_one(model_name, prompt)))
+            judgements = [await task for task in tasks]
             
             score = sum(judgements)
             logging.info(f"     - Judgement scores (1=correct): {judgements} | Total Score: {score}")
