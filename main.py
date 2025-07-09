@@ -5,6 +5,7 @@
 import logging
 import config
 from src import stages, utils
+import asyncio
 
 def main():
     """执行整个流水线。"""
