@@ -23,17 +23,11 @@ def main():
     # 2. 准备工作：创建数据目录和示例种子文件
     utils.setup_data_directory_and_seed_file(config.DATA_DIR, config.SEED_FILE)
 
-    # 3. 执行阶段一：数据生成
-    stages.run_generation_stage(
-        seed_file=config.SEED_FILE,
-        output_file=config.GENERATED_FILE
-    )
-
-    # 4. 执行阶段二：质量筛选
-    stages.run_filtering_stage(
-        generated_file=config.GENERATED_FILE,
-        output_file=config.QUALIFIED_FILE
-    )
+    async def async_main():
+        # 3. 执行问题生成
+        await run_generation_stage(seed_file=SEED_FILE, output_file=GENERATED_FILE)
+        # 4. 执行问题筛选
+        await run_filtering_stage(generated_file=GENERATED_FILE, output_file=QUALIFIED_FILE)
 
     logging.info("="*50)
     logging.info("Pipeline finished successfully!")
