@@ -82,8 +82,12 @@ async def run_filtering_stage(generated_file: str, output_file: str) -> None:
                 messages = [{"role": "user", "content": prompt}]
                 response_text = await asyncio.to_thread(llm_api.call_llm, model_name, messages)
                 eval_result = utils.parse_eval_result(response_text)
-                if (question['ground_truth'] == 'Correct' and eval_result == 'T') or \
-                   (question['ground_truth'] == 'Wrong' and eval_result == 'F'):
+                # 如果模型输出格式不符合要求
+                if eval_result == "Error":
+                    response_text = await asyncio.to_thread(call_llm, "qwen2-72b-instruct", messages)
+                    eval_result = parse_eval_result(response_text)
+                if (question['ground_truth'] == 'Correct' and 'T' in eval_result) or \
+                   (question['ground_truth'] == 'Wrong' and 'F' in eval_result):
                     return 1
                 return 0
 
