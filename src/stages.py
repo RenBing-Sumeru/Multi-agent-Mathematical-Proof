@@ -72,8 +72,9 @@ async def run_filtering_stage(generated_file: str, output_file: str) -> None:
     qualified_questions = []
     for packet in all_generated_data:
         logging.info(f"--- Filtering Packet for Seed ID: {packet['seed_id']} ---")
-        questions_to_filter = [packet['original_correct']] + packet['generated_incorrect']
-        random.shuffle(questions_to_filter)
+        qualified_questions.append([packet['original_correct'])
+        record = len(qualified_questions)
+        questions_to_filter = packet['generated_incorrect']
 
         for question in questions_to_filter:
             logging.info(f"  -- Filtering question: {question['id']} (Truth: {question['ground_truth']})")
@@ -106,5 +107,9 @@ async def run_filtering_stage(generated_file: str, output_file: str) -> None:
                 qualified_questions.append({**question, "score": score})
             else:
                 logging.info(f"     -> DISCARDED.")
+        
+        # 如果所有的incorrect text都被删除
+        if len(qualified_questions) == record:
+            qualified_questions = qualified_question[:-1]
 
     utils.save_to_json(qualified_questions, output_file)
