@@ -33,8 +33,8 @@ def parse_generated_items(text: str) -> List[str]:
     return re.findall(r'\[incorrect_(?:proof|definition)_\d-start\]\s*(.*?)\s*\[incorrect_(?:proof|definition)_\d-end\]', text, re.DOTALL)
 
 def parse_eval_result(text: str) -> str:
-    """从评测模型的输出中解析出T或F。返回 'T', 'F', 或 'Error'。"""
-    match = re.search(r'\\boxed\{(T|F)\}', text)
+    """从评测模型的输出中解析出包含T或F的\boxed{}内容。返回匹配的字符串或'Error'。"""
+    match = re.search(r'\\boxed\{([^}]*(T|F)[^}]*)\}', text)
     return match.group(1) if match else "Error"
 
 def setup_data_directory_and_seed_file(dir_path: str, seed_filepath: str) -> None:
