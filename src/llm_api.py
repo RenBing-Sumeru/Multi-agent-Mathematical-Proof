@@ -12,23 +12,30 @@ from tenacity import retry, stop_after_attempt, wait_random_exponential
 
 from config import API_CONFIG
 
-# --- API 客户端初始化 ---
-try:
-    # OpenAI compatible clients
-    client_openai = openai.OpenAI(api_key=API_CONFIG["openai"]["api_key"])
-    client_deepseek = openai.OpenAI(**API_CONFIG["deepseek"])
-    client_qwen = openai.OpenAI(**API_CONFIG["qwen"])
-    
-    # Google Gemini
-    genai.configure(api_key=API_CONFIG["google"]["api_key"])
-    
-    # Anthropic Claude
-    client_anthropic = anthropic.Anthropic(api_key=API_CONFIG["anthropic"]["api_key"])
-    
-    logging.info("All API clients initialized successfully.")
-except Exception as e:
-    logging.error(f"Error initializing API clients: {e}", exc_info=True)
-    raise
+_CLIENT_CACHE = {}
+
+def _get_client(model_name: str):
+    """按需初始化客户端，并缓存以避免重复初始化"""
+    global _CLIENT_CACHE
+
+    if model_name in _CLIENT_CACHE:
+        return _CLIENT_CACHE[model_name]
+
+    if "gpt" in model_name or "o3" in model_name or "o4" in model_name:
+        client = openai.OpenAI(**API_CONFIG["openai"])
+    elif "deepseek" in model_name:
+        client = openai.OpenAI(**API_CONFIG["deepseek"])
+    elif "qwen" in model_name:
+        client = openai.OpenAI(**API_CONFIG["qwen"])
+    elif "gemini" in model_name:
+        client = openai.OpenAI(**API_CONFIG["google"])
+    elif "claude" in model_name:
+        client = anthropic.Anthropic(**API_CONFIG["anthropic"])
+    else:
+        raise ValueError(f"Unknown model provider for: {model_name}")
+
+    _CLIENT_CACHE[model_name] = client
+    return client
 
 @retry(wait=wait_random_exponential(min=1, max=60), stop=stop_after_attempt(6))
 def call_llm(model_name: str, messages: List[Dict[str, str]], temperature: float = 0.5) -> str:
@@ -52,37 +59,29 @@ def call_llm(model_name: str, messages: List[Dict[str, str]], temperature: float
     
     try:
         # OpenAI Compatible (OpenAI, DeepSeek, Qwen)
-        if any(key in model_name for key in ["gpt", "o3", "deepseek", "qwen"]):
-            client = {
-                "gpt": client_openai, "o3": client_openai,
-                "deepseek": client_deepseek, "qwen": client_qwen
-            }[next(key for key in ["gpt", "o3", "deepseek", "qwen"] if key in model_name)]
+        if any(key in model_name for key in ["gpt", "o3", "o4", "deepseek", "qwen", "gemini"]):
+            client = _get_client(model_name)
             
             response = client.chat.completions.create(
                 model=model_name, messages=messages, temperature=temperature
             )
             response_text = response.choices[0].message.content
 
-        # Google Gemini
-        elif "gemini" in model_name:
-            gemini_model = genai.GenerativeModel(model_name)
-            system_prompt = messages[0].get('content') if messages and messages[0]['role'] == 'system' else None
-            user_prompt = messages[-1]['content']
-            response = gemini_model.generate_content(user_prompt, system_instruction=system_prompt)
-            response_text = response.text
-
         # Anthropic Claude
         elif "claude" in model_name:
+            client = _get_client(model_name)
             system_prompt = messages[0].get('content', '') if messages and messages[0]['role'] == 'system' else ""
             user_messages = messages[1:] if system_prompt else messages
-            response = client_anthropic.messages.create(
+            response = client.messages.create(
                 model=model_name, max_tokens=4096, system=system_prompt, messages=user_messages, temperature=temperature
             )
             response_text = response.content[0].text
 
         else:
             raise ValueError(f"Unknown model provider for: {model_name}")
-            
+    except KeyError as e:
+        logging.error(f"Missing API configuration for model: {model_name}. Error: {e}", exc_info=True)
+        raise ValueError(f"Missing required API config for model: {model_name}") from e      
     except Exception as e:
         logging.error(f"API call to {model_name} failed. Error: {e}", exc_info=True)
         raise

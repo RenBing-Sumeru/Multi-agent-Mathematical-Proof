@@ -1,0 +1,119 @@
+[
+    {
+        "seed_id": "def_001",
+        "type": "definition",
+        "original_correct": {
+            "id": "def_001_original",
+            "content": {
+                "text": "A function f...is called injective...if f(x) = f(y), then x = y."
+            },
+            "ground_truth": "Correct"
+        },
+        "generated_incorrect": [
+            {
+                "id": "def_001_gen_0",
+                "content": {
+                    "text": "A function f is called injective if f(x) = f(y), then x ≤ y."
+                },
+                "ground_truth": "Wrong"
+            },
+            {
+                "id": "def_001_gen_1",
+                "content": {
+                    "text": "A function f is called injective if f(x) = f(y), then x ≈ y."
+                },
+                "ground_truth": "Wrong"
+            },
+            {
+                "id": "def_001_gen_2",
+                "content": {
+                    "text": "A function f is called injective if f(x) = f(y) for all x, y implies x ≠ y."
+                },
+                "ground_truth": "Wrong"
+            },
+            {
+                "id": "def_001_gen_3",
+                "content": {
+                    "text": "A function f is called injective if f(x) ≠ f(y) implies x = y."
+                },
+                "ground_truth": "Wrong"
+            },
+            {
+                "id": "def_001_gen_4",
+                "content": {
+                    "text": "A function f...is called injective...if f(x) != f(y), then x = y."
+                },
+                "ground_truth": "Wrong"
+            },
+            {
+                "id": "def_001_gen_5",
+                "content": {
+                    "text": "A function f...is called injective...if f(x) = f(y), then x != y."
+                },
+                "ground_truth": "Wrong"
+            }
+        ]
+    },
+    {
+        "seed_id": "proof_001",
+        "type": "proposition-proof",
+        "original_correct": {
+            "id": "proof_001_original",
+            "content": {
+                "proposition": "For any integer n, if n^2 is odd, then n is odd.",
+                "proof": "We prove the contrapositive..."
+            },
+            "ground_truth": "Correct"
+        },
+        "generated_incorrect": [
+            {
+                "id": "proof_001_gen_0",
+                "content": {
+                    "proposition": "For any integer n, if n^2 is odd, then n is odd.",
+                    "proof": "We prove the contrapositive: if n is even, then n^2 is odd. Suppose n is even. Then n = 2k for some integer k. Thus, n^2 = (2k)^2 = 4k^2 = 2(2k^2), which is even. This contradicts our assumption that n^2 is odd, so the original statement must be true."
+                },
+                "ground_truth": "Wrong"
+            },
+            {
+                "id": "proof_001_gen_1",
+                "content": {
+                    "proposition": "For any integer n, if n^2 is odd, then n is odd.",
+                    "proof": "We prove the contrapositive: if n is odd, then n^2 is even. Suppose n is odd. Then n = 2k + 1 for some integer k. Thus, n^2 = (2k + 1)^2 = 4k^2 + 4k + 1 = 2(2k^2 + 2k) + 1, which is odd. This contradicts our assumption that n^2 is even, so the original statement must be true."
+                },
+                "ground_truth": "Wrong"
+            },
+            {
+                "id": "proof_001_gen_2",
+                "content": {
+                    "proposition": "For any integer n, if n^2 is odd, then n is odd.",
+                    "proof": "We prove the contrapositive: if \\( n \\) is even, then \\( n^2 \\) is even. Suppose \\( n \\) is even, so \\( n = 2k \\) for some integer \\( k \\). Then\n\\[\nn^2 = (2k)^2 = 4k^2 = 2(2k^2),\n\\]\nwhich is always even. Therefore, if \\( n^2 \\) is odd, \\( n \\) must be even, so the original statement holds."
+                },
+                "ground_truth": "Wrong"
+            },
+            {
+                "id": "proof_001_gen_3",
+                "content": {
+                    "proposition": "For any integer n, if n^2 is odd, then n is odd.",
+                    "proof": "We prove the contrapositive: if \\( n \\) is even, then \\( n^2 \\) is even. Suppose \\( n \\) is even, so \\( n = 2k \\) for some integer \\( k \\). Then\n\\[\nn^2 = (2k)^2 = 4k^2 = 2(2k^2),\n\\]\nwhich is even. Therefore, if \\( n^2 \\) is even, \\( n \\) must be even, so the original statement is true."
+                },
+                "ground_truth": "Wrong"
+            },
+            {
+                "id": "proof_001_gen_4",
+                "content": {
+                    "proposition": "For any integer n, if n^2 is odd, then n is odd.",
+                    "proof": "We prove the contrapositive: If n is even, then n^2 is even.\nAssume n is even. By definition of even, n = 2k for some non-negative integer k.\nThen n^2 = (2k)^2 = 4k^2.\nWe can write 4k^2 as 2(2k^2).\nSince 2k^2 is an integer (let m = 2k^2), n^2 = 2m.\nBy definition of even, n^2 is even.\nConclusion: Since the contrapositive is true for non-negative integers, the original proposition is true for all integers."
+                },
+                "ground_truth": "Wrong"
+            },
+            {
+                "id": "proof_001_gen_5",
+                "content": {
+                    "proposition": "For any integer n, if n^2 is odd, then n is odd.",
+                    "proof": "We prove the contrapositive: If n is even, then n^2 is even.\nAssume n is even. By definition of even, n = 2k for some integer k.\nThen n^2 = (2k)^2 = 4k^2.\nWe can write 4k^2 as 2(2k^2).\nSince 2k^2 is an integer (let m = 2k^2), n^2 = 2m.\nBy definition of even, n^2 is even.\nConclusion: Since the contrapositive is true, the original proposition is false."
+                },
+                "ground_truth": "Wrong"
+            }
+        ]
+    }
+]

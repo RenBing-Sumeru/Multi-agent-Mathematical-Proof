@@ -31,14 +31,14 @@ async def run_generation_stage(seed_file: str, output_file: str) -> None:
         generated_items_from_all_models = []
         
         async def get_items(model_name):
-            system_prompt = PROOF_GEN_PROMPT if seed['type'] == 'proposition-proof' else DEFINITION_GEN_PROMPT
+            system_prompt = prompts.PROOF_GEN_PROMPT if seed['type'] == 'proposition-proof' else prompts.DEFINITION_GEN_PROMPT
             if seed['type'] == 'proposition-proof':
                 user_content = f"Here's the proposition:\n\n{seed['content']['proposition']}\n\n\nHere's the proof:\n\n{seed['content']['proof']}"
             else:
                 user_content = f"Here's the definition:\n\n{seed['content']['text']}"
             messages = [{"role": "system", "content": system_prompt}, {"role": "user", "content": user_content}]
-            response_text = await asyncio.to_thread(call_llm, model_name, messages)
-            items = [item.strip() for item in parse_generated_items(response_text)]
+            response_text = await asyncio.to_thread(llm_api.call_llm, model_name, messages)
+            items = [item.strip() for item in utils.parse_generated_items(response_text)]
             print(f"  - Model {model_name} generated {len(items)} items.")
             sampled_items = random.sample(items, 2) if len(items) >= 2 else items
             return sampled_items
@@ -46,7 +46,7 @@ async def run_generation_stage(seed_file: str, output_file: str) -> None:
         tasks = []
         
         async with asyncio.TaskGroup() as tg:
-            for model_name in GENERATOR_MODELS:
+            for model_name in config.GENERATOR_MODELS:
                 tasks.append(tg.create_task(get_items(model_name)))
         for task in tasks:
             generated_items_from_all_models.extend(await task)
@@ -73,14 +73,14 @@ async def run_filtering_stage(generated_file: str, output_file: str) -> None:
     for packet in all_generated_data:
         logging.info(f"--- Filtering Packet for Seed ID: {packet['seed_id']} ---")
         questions_to_filter = [packet['original_correct']] + packet['generated_incorrect']
-        questions_to_filter = random.shuffle(questions_to_filter)
+        random.shuffle(questions_to_filter)
 
         for question in questions_to_filter:
             logging.info(f"  -- Filtering question: {question['id']} (Truth: {question['ground_truth']})")
             async def judge_one(model_name, prompt):
                 messages = [{"role": "user", "content": prompt}]
-                response_text = await asyncio.to_thread(call_llm, model_name, messages)
-                eval_result = parse_eval_result(response_text)
+                response_text = await asyncio.to_thread(llm_api.call_llm, model_name, messages)
+                eval_result = utils.parse_eval_result(response_text)
                 if (question['ground_truth'] == 'Correct' and eval_result == 'T') or \
                    (question['ground_truth'] == 'Wrong' and eval_result == 'F'):
                     return 1
@@ -89,12 +89,12 @@ async def run_filtering_stage(generated_file: str, output_file: str) -> None:
             tasks = []
             
             async with asyncio.TaskGroup() as tg:
-                for model_name in FILTER_MODELS:
-                    for _ in range(JUDGEMENT_RUNS_PER_MODEL):
+                for model_name in config.FILTER_MODELS:
+                    for _ in range(config.JUDGEMENT_RUNS_PER_MODEL):
                         if packet['type'] == 'proposition-proof':
-                            prompt = PROOF_EVAL_PROMPT + f"\n\n{question['content']['proposition']}\n\n\nHere is the proof:\n\n{question['content']['proof']}"
+                            prompt = prompts.PROOF_EVAL_PROMPT + f"\n\n{question['content']['proposition']}\n\n\nHere is the proof:\n\n{question['content']['proof']}"
                         else:
-                            prompt = DEFINITION_EVAL_PROMPT + f"\n\n{question['content']['text']}"
+                            prompt = prompts.DEFINITION_EVAL_PROMPT + f"\n\n{question['content']['text']}"
                         tasks.append(tg.create_task(judge_one(model_name, prompt)))
             judgements = [await task for task in tasks]
             
