@@ -50,3 +50,15 @@ Below is a mathematical proposition and its proof. Please think step by step and
 \nOutput format: you should put your final judge inside a \\boxed{}, and put it at the end of your output. So you should return \\boxed{T} if you think the proof is correct, and \\boxed{F} if you think the proof is incorrect.
 \nHere is the proposition:
 """
+
+# --- "模型裁判" Prompts (新增) ---
+MODEL_JUDGE_DEFINITION_PROMPT = """
+Below is a mathematical definition. Please think step by step and judge whether it is a correct definition or not. Here "correct" means mathematically correct, so you should only focus on whether the mathematics and logic in it are correct, and your judge should not be influenced by those non-mathematical things. In particular, your judge should not be influenced by things related to references such as things inside a \\ref{}, or the index of a refered lemma.
+Output format: you should put your final judge inside a \\boxed{}, and put it at the end of your output. So you should return \\boxed{T} if you think the definition is correct, and \\boxed{F} if you think the definition is incorrect.
+Here is the definition:
+"""
+MODEL_JUDGE_PROOF_PROMPT = """
+Below is a mathematical proposition and its proof. Please think step by step and judge whether the proof is correct or not. Here "correct" means mathematically correct, so you should only focus on whether the mathematics and logic in it are correct, and your judge should not be influenced by those non-mathematical things. In particular, your judge should not be influenced by things related to references such as things inside a \\ref{}, or the index of a refered lemma.
+Output format: you should put your final judge inside a \\boxed{}, and put it at the end of your output. So you should return \\boxed{T} if you think the proof is correct, and \\boxed{F} if you think the proof is incorrect.
+Here is the proposition:
+"""

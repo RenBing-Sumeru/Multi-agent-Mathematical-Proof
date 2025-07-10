@@ -5,7 +5,7 @@ import json
 import logging
 import os
 import re
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional, Literal
 
 def save_to_json(data: Any, filepath: str) -> None:
     """将数据保存为JSON文件。"""
@@ -36,6 +36,10 @@ def parse_eval_result(text: str) -> str:
     """从评测模型的输出中解析出包含T或F的\boxed{}内容。返回匹配的字符串或'Error'。"""
     match = re.search(r'\\boxed\{([^}]*(T|F)[^}]*)\}', text)
     return match.group(1) if match else "Error"
+
+def normalize_text(text: str) -> str:
+    """移除所有空格和换行符，用于去重比较。"""
+    return re.sub(r'\s+', '', text)
 
 def setup_data_directory_and_seed_file(dir_path: str, seed_filepath: str) -> None:
     """确保数据目录存在，如果种子文件不存在，则创建一个示例文件。"""
