@@ -1,42 +1,42 @@
 # Multi-agent-Mathematical-Proof
 
-# 数学判断题自动化生成与评测流水线
+# Automated Generation and Evaluation Pipeline for Mathematical True/False Questions
 
-本项目是一个基于大型语言模型（LLM）的自动化流水线，旨在将数学领域的定义或证明题，转化为高质量的、用于模型评测的判断题。
+This project is an automated pipeline based on Large Language Models (LLMs), designed to convert mathematical definitions or proofs into high-quality true/false questions suitable for model evaluation.
 
-## ✨ 功能特性
+## ✨ Features
 
-- **数据生成**: 利用多个不同的LLM（如GPT、Gemini、Claude等），将正确的数学定义/证明批量改写为包含细微错误的、具有迷惑性的版本。
-- **质量筛选**: 通过一组“评判”LLM对生成的数据进行多轮交叉验证，自动筛选出难度适中、逻辑有效的题目。
-- **高度可配置**: 所有的模型、参数、文件路径均可在 `config.py` 中轻松配置。
-- **模块化设计**: 代码结构清晰，遵循软件工程最佳实践，易于维护和二次开发。
+- **Data Generation**: Utilizes multiple different LLMs (such as GPT, Gemini, Claude, etc.) to batch-rewrite correct mathematical definitions/proofs into misleading versions that contain subtle errors.
+- **Quality Filtering**: Employs a set of "adjudicator" LLMs to perform multi-round cross-validation on the generated data, automatically filtering for questions that are of moderate difficulty and are logically valid.
+- **Highly Configurable**: All models, parameters, and file paths can be easily configured in 'config.py'.
+- **Modular Design**: The code structure is clear, follows software engineering best practices, and is easy to maintain and further develop.
 
-## 🏛️ 项目结构
+## 🏛️ Project Structure
 
 ```
 math_question_pipeline/
-├── README.md               # 项目说明书
-├── requirements.txt        # 依赖库
-├── config.py               # 全局配置文件
-├── main.py                 # 主程序入口
+├── README.md               # Project description
+├── requirements.txt        # Dependencies
+├── config.py               # Global configuration file
+├── main.py                 # Main program entry point
 └── src/
     ├── __init__.py
-    ├── llm_api.py          # LLM API 交互模块
-    ├── prompts.py          # Prompt模板模块
-    ├── stages.py           # 核心流水线阶段模块
-    └── utils.py            # 通用工具函数模块
+    ├── llm_api.py          # LLM API interaction module
+    ├── prompts.py          # Prompt template module
+    ├── stages.py           # Core pipeline stages module
+    └── utils.py            # General utility functions module
 ```
 
-## 🚀 快速开始
+## 🚀 Quick Start
 
-### 1. 克隆仓库
+### 1. Clone the repository
 
 ```bash
 git clone https://github.com/RenBing-Sumeru/Multi-agent-Mathematical-Proof.git
 cd Multi-agent-Mathematical-Proof
 ```
 
-### 2. 创建并激活虚拟环境 (推荐)
+### 2. Create and activate a virtual environment (Recommended)
 
 ```bash
 python -m venv venv
@@ -46,22 +46,22 @@ venv\Scripts\activate
 source venv/bin/activate
 ```
 
-### 3. 安装依赖
+### 3. Install dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 4. 配置API密钥
+### 4. Configure API Keys
 
-本项目需要访问多个LLM的API。请将您的API密钥设置为环境变量：
+This project requires access to the APIs of multiple LLMs. Please set your API keys as environment variables:
 
 ```bash
 # macOS / Linux
 export OPENAI_API_KEY="sk-..."
 export GOOGLE_API_KEY="AIzaSy..."
 export ANTHROPIC_API_KEY="sk-ant-..."
-export DEEPSEEK_API_KEY="..." # 根据需要设置
+export DEEPSEEK_API_KEY="..." # Set as needed
 
 # Windows (CMD)
 set OPENAI_API_KEY=sk-...
@@ -69,14 +69,14 @@ set GOOGLE_API_KEY=AIzaSy...
 # ...
 ```
 
-### 5. 运行流水线
+### 5. Run the pipeline
 
 ```bash
 python main.py
 ```
 
-程序将自动创建`data`目录及示例输入文件，并开始执行。最终产出的高质量数据集将保存在 `data/qualified_data.json` 中。
+The program will automatically create the data directory and a sample input file, and then begin execution. The final high-quality dataset will be saved in 'data/qualified_data.json'.
 
-## ⚙️ 配置
+## ⚙️ Configuration
 
-如需更换模型或调整参数（如评判次数、筛选分数阈值），请直接修改 `config.py` 文件。
+To change models or adjust parameters (such as the number of evaluation rounds, screening score thresholds), please directly modify the 'config.py' file.
