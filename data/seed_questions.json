@@ -1,0 +1,17 @@
+[
+    {
+        "id": "def_001",
+        "type": "definition",
+        "content": {
+            "text": "A function f...is called injective...if f(x) = f(y), then x = y."
+        }
+    },
+    {
+        "id": "proof_001",
+        "type": "proposition-proof",
+        "content": {
+            "proposition": "For any integer n, if n^2 is odd, then n is odd.",
+            "proof": "We prove the contrapositive..."
+        }
+    }
+]
