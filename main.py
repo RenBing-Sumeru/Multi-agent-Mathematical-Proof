@@ -1,6 +1,6 @@
 
 """
-该脚本将按顺序执行整个数学问题生成与筛选流水线。
+This script will execute the entire mathematical question generation and filtering pipeline in sequence.
 """
 import logging
 import config
@@ -9,8 +9,8 @@ import asyncio
 import argparse
 
 def main():
-    """执行整个流水线。"""
-    # 设置命令行参数解析器
+    """Execute the entire pipeline."""
+    # Set up the command-line argument parser
     parser = argparse.ArgumentParser(description="Mathematical Question Generation and Filtering Pipeline.")
     parser.add_argument(
         '--stage', 
@@ -21,7 +21,7 @@ def main():
     )
     args = parser.parse_args()
 
-    # 1. 配置日志记录
+    # 1. Configure logging
     logging.basicConfig(
         level=logging.INFO,
         format='%(asctime)s - %(levelname)s - %(module)s - %(message)s',
@@ -32,40 +32,40 @@ def main():
     logging.info("Starting Mathematical Question Generation Pipeline")
     logging.info("="*50)
 
-    # 2. 准备工作：创建数据目录和示例种子文件
+    # 2. Preparation: Create data directory and example seed file
     utils.setup_data_directory_and_seed_file(config.DATA_DIR, config.SEED_FILE)
 
     # async def async_main():
-    #     # 阶段一: 生成
+    #     # Stage one: Generate
     #     await stages.run_generation_stage(
     #         seed_file=config.SEED_FILE,
     #         output_file=config.GENERATED_FILE
     #     )
-    #     # 阶段二: 去重 (这是一个同步函数)
+    #     # Stage two: Deduplication (this is a synchronous function)
     #     stages.run_deduplication_stage(
     #         generated_file=config.GENERATED_FILE,
     #         output_file=config.DEDUPLICATED_FILE
     #     )
-    #     # 阶段三: 筛选
+    #     # Stage three: Filter
     #     await stages.run_filtering_stage(
     #         deduplicated_file=config.DEDUPLICATED_FILE,
     #         output_file=config.QUALIFIED_FILE
     #     )
         
     async def async_main():
-    # 根据命令行参数，选择性地执行不同阶段
+    # Selectively execute different stages based on command-line arguments
     
-    # 如果参数是 'all' 或 'generate'，则执行生成和去重阶段
+    # If the argument is 'all' or 'generate', execute the generation and deduplication stages
     if args.stage in ['all', 'generate']:
         await stages.run_generation_stage(config.SEED_FILE, config.GENERATED_FILE)
         stages.run_deduplication_stage(config.GENERATED_FILE, config.DEDUPLICATED_FILE)
     
-    # 如果参数是 'all' 或 'filter'，则执行筛选阶段
+    # 如If the argument is 'all' or 'filter', execute the filtering stage
     if args.stage in ['all', 'filter']:
         await stages.run_filtering_stage(config.DEDUPLICATED_FILE, config.QUALIFIED_FILE)
             
  
-    # 运行主异步函数
+    # Run the main asynchronous function
     asyncio.run(async_main())
 
     logging.info("="*50)

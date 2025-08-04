@@ -1,5 +1,5 @@
 
-"""封装与各类大型语言模型API的交互逻辑"""
+"""Encapsulates the interaction logic with various large language models"""
 
 import logging
 import time
@@ -15,7 +15,7 @@ from config import API_CONFIG
 _CLIENT_CACHE = {}
 
 def _get_client(model_name: str):
-    """按需初始化客户端，并缓存以避免重复初始化"""
+    """Initializes clients on demand and caches them to avoid repeated initialization"""
     global _CLIENT_CACHE
 
     if model_name in _CLIENT_CACHE:
@@ -40,19 +40,19 @@ def _get_client(model_name: str):
 @retry(wait=wait_random_exponential(min=1, max=60), stop=stop_after_attempt(6))
 def call_llm(model_name: str, messages: List[Dict[str, str]], temperature: float = 0.5) -> str:
     """
-    根据模型名称调用对应的API，并实现自动重试。
+    Calls the corresponding API based on the model name and implements automatic retries.
 
     Args:
-        model_name: 要调用的模型名称。
-        messages: 符合OpenAI格式的消息列表。
-        temperature: 生成的温度参数。
+        model_name: The name of the model to call.
+        messages: A list of messages in OpenAI format.
+        temperature: The temperature parameter for generation.
 
     Returns:
-        模型的文本响应。
+        The text response from the model.
     
     Raises:
-        ValueError: 如果模型提供商未知。
-        Exception: 如果API调用失败。
+        ValueError: If the model provider is unknown.
+        Exception: If the API call fails.
     """
     logging.info(f"Calling model: {model_name}...")
     start_time = time.time()

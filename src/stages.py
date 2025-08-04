@@ -1,5 +1,5 @@
 
-"""包含流水线的核心阶段：数据生成和质量筛选。"""
+"""Contains the core stages of the pipeline: data generation and quality filtering."""
 
 import logging
 import random
@@ -11,7 +11,7 @@ from src import prompts, llm_api, utils
 
 async def run_generation_stage(seed_file: str, output_file: str) -> None:
     """
-    执行阶段一：从种子文件生成包含错误证明/定义的数据。
+    Executes stage one: Generate data containing incorrect proofs/definitions from the seed file.
     """
     logging.info("="*20 + " STAGE 1: DATA GENERATION " + "="*20)
     seed_questions = utils.load_from_json(seed_file)
@@ -60,7 +60,7 @@ async def run_generation_stage(seed_file: str, output_file: str) -> None:
     utils.save_to_json(all_generated_data, output_file)
 
 def run_deduplication_stage(generated_file: str, output_file: str):
-    """阶段二：数据去重。"""
+    """Stage two: Data deduplication."""
     logging.info("\n" + "="*20 + " STAGE 2: DEDUPLICATION " + "="*20)
     all_generated_data = utils.load_from_json(generated_file)
     if not all_generated_data:
@@ -91,7 +91,7 @@ def run_deduplication_stage(generated_file: str, output_file: str):
     utils.save_to_json(deduplicated_data, output_file)
 
 async def run_filtering_stage(deduplicated_file: str, output_file: str):
-    """阶段三：质量筛选 (使用新逻辑)。"""
+    """Stage three: Quality filtering (using new logic)."""
     logging.info("\n" + "="*20 + " STAGE 3: QUALITY FILTERING " + "="*20)
     all_deduplicated_data = utils.load_from_json(deduplicated_file)
     if not all_deduplicated_data:

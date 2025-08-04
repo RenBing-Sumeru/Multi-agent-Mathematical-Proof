@@ -1,6 +1,6 @@
-# Multi-agent-Mathematical-Proof
+# Proof2Hybrid
 
-# Automated Generation and Evaluation Pipeline for Mathematical True/False Questions
+# Fully Automated Framework for Mathematical Benchmark Synthesis
 
 This project is an automated pipeline based on Large Language Models (LLMs), designed to convert mathematical definitions or proofs into high-quality true/false questions suitable for model evaluation.
 
@@ -19,6 +19,8 @@ math_question_pipeline/
 ├── requirements.txt        # Dependencies
 ├── config.py               # Global configuration file
 ├── main.py                 # Main program entry point
+├── data                    # Our main dataset
+├── figures                 # Related experimental result graph
 └── src/
     ├── __init__.py
     ├── llm_api.py          # LLM API interaction module

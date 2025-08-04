@@ -1,8 +1,8 @@
-"""全局配置文件"""
+"""Global configuration file"""
 
 import os
 
-# --- API密钥和端点配置 ---
+# --- API Key and Endpoint Configuration ---
 API_CONFIG = {
     "openai": {
         "api_key": os.environ.get("OPENAI_API_KEY", "YOUR_OPENAI_KEY"),
@@ -23,8 +23,8 @@ API_CONFIG = {
     }
 }
 
-# --- 模型名称配置 ---
-# 阶段一：用于生成错误证明/定义的模型
+# --- Model Name Configuration ---
+# Stage 1: Models used for generating error explanations/definitions
 GENERATOR_MODELS = [
     "deepseek-v3",   #"deepseek-chat"
     "qwen-turbo", # qwen2.5-72b-instruct 
@@ -33,7 +33,7 @@ GENERATOR_MODELS = [
     "gpt-4.1",  #"gpt-4-turbo"
 ]
 
-# 阶段二：用于评判和筛选的模型
+# Stage 2: Models used for judging and filtering
 FILTER_MODELS = [
     "o4-mini",  
     "deepseek-r1-0528",  
@@ -41,18 +41,18 @@ FILTER_MODELS = [
     "qwen-max",  # qwen3-235b-a22b 
 ]
 
-# 用于“模型裁判”备用方案的模型
+# Model for the "model judge" fallback plan
 JUDGE_MODEL = "qwen-turbo" # qwen2.5-72b-instruct
 
-# --- 流程参数配置 ---
-NUM_TO_GENERATE = 6  # 每个生成模型要产出的错误版本数量
-NUM_TO_SAMPLE = 2    # 从生成的错误版本中随机抽取的数量
+# --- Pipeline Parameter Configuration ---
+NUM_TO_GENERATE = 6  # Number of error versions to be produced by each generation model
+NUM_TO_SAMPLE = 2    # Number to be randomly sampled from the generated error versions
 
-JUDGEMENT_RUNS_PER_MODEL = 3  # 每个评判模型对同一题目的评判次数
-QUALIFIED_SCORE_MIN = 4       # 合格题目的最低分 (总计 len(FILTER_MODELS) * JUDGEMENT_RUNS_PER_MODEL 次)
-QUALIFIED_SCORE_MAX = 7      # 合格题目的最高分
+JUDGEMENT_RUNS_PER_MODEL = 3  # Number of judgment runs for the same question by each filter model
+QUALIFIED_SCORE_MIN = 4       # Minimum score for a qualified question (total of len(FILTER_MODELS) * JUDGEMENT_RUNS_PER_MODEL runs)
+QUALIFIED_SCORE_MAX = 7      # Maximum score for a qualified question
 
-# --- 文件与目录路径配置 ---
+# --- File and Directory Path Configuration ---
 DATA_DIR = "data"
 SEED_FILE = os.path.join(DATA_DIR, "seed_questions.json")
 GENERATED_FILE = os.path.join(DATA_DIR, "1_generated_data.json")

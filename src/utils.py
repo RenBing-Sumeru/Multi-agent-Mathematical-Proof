@@ -1,5 +1,5 @@
 
-"""存放通用工具函数，如文件操作、内容解析等。"""
+"""Contains utility functions, such as file operations, content parsing, etc."""
 
 import json
 import logging
@@ -8,7 +8,7 @@ import re
 from typing import List, Dict, Any, Optional, Literal
 
 def save_to_json(data: Any, filepath: str) -> None:
-    """将数据保存为JSON文件。"""
+    """Saves data to a JSON file."""
     try:
         with open(filepath, 'w', encoding='utf-8') as f:
             json.dump(data, f, indent=4, ensure_ascii=False)
@@ -17,7 +17,7 @@ def save_to_json(data: Any, filepath: str) -> None:
         logging.error(f"Failed to save data to {filepath}: {e}")
 
 def load_from_json(filepath: str) -> Any:
-    """从JSON文件加载数据。"""
+    """Loads data from a JSON file."""
     try:
         with open(filepath, 'r', encoding='utf-8') as f:
             return json.load(f)
@@ -29,20 +29,20 @@ def load_from_json(filepath: str) -> Any:
         return None
 
 def parse_generated_items(text: str) -> List[str]:
-    """从生成模型的输出中解析出所有错误版本。"""
+    """Parses all incorrect versions from the output of the generation model."""
     return re.findall(r'\[incorrect_(?:proof|definition)_\d-start\]\s*(.*?)\s*\[incorrect_(?:proof|definition)_\d-end\]', text, re.DOTALL)
 
 def parse_eval_result(text: str) -> str:
-    """从评测模型的输出中解析出包含T或F的\boxed{}内容。返回匹配的字符串或'Error'。"""
+    """Parses the content enclosed in boxed{} from the evaluation model's output. Returns the matched string or 'Error'."""
     match = re.search(r'\\boxed\{([^}]*(T|F)[^}]*)\}', text)
     return match.group(1) if match else "Error"
 
 def normalize_text(text: str) -> str:
-    """移除所有空格和换行符，用于去重比较。"""
+    """Removes all spaces and newlines for deduplication comparison."""
     return re.sub(r'\s+', '', text)
 
 def setup_data_directory_and_seed_file(dir_path: str, seed_filepath: str) -> None:
-    """确保数据目录存在，如果种子文件不存在，则创建一个示例文件。"""
+    """Ensures the data directory exists, and if the seed file does not exist, creates a sample file."""
     os.makedirs(dir_path, exist_ok=True)
     if not os.path.exists(seed_filepath):
         logging.warning(f"Seed file not found. Creating a dummy seed file at '{seed_filepath}'...")
