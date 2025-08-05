@@ -4,6 +4,8 @@
 
 This project is an automated pipeline based on Large Language Models (LLMs), designed to convert mathematical definitions or proofs into high-quality true/false questions suitable for model evaluation.
 
+The paper is at https://arxiv.org/abs/2508.02208.
+
 ## ✨ Features
 
 - **Data Generation**: Utilizes multiple different LLMs (such as GPT, Gemini, Claude, etc.) to batch-rewrite correct mathematical definitions/proofs into misleading versions that contain subtle errors.
